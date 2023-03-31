@@ -56,28 +56,34 @@ def paired_eval(scores, labels, min_dist=0.5):
     
     # Computes an inversion count (cnt) on the [left, right] region of arr
     def _merge_sort(l, r):
-        cnt = 0
-        if l >= r: return cnt
+        if l >= r: return 0
         
         # Recurse on [left, mid) and [mid, right]
         m = (l + r)//2
-        cnt += _merge_sort(l, m)
+        cnt  = _merge_sort(l, m)
         cnt += _merge_sort(m+1, r)
         
+        # i2 points to the element in l that is at least min_dist higher than j
+        i = l; j = m+1; k = l; i2 = l
+        while i2 <= m and (arr[i2] - arr[j]) < min_dist: i2 += 1
+
         # Count inversions from the merge
-        i = l; j = m+1; k = l
         while i <= m and j <= r:
-            
-            # No inversions if (i, j) is ranked correctly
-            if arr[i] <= arr[j]:
-                tmp[k] = arr[i]
-                i += 1; k += 1
-            
-            # Otherwise, everything up to mid is an inversion relative to j
-            else:
-                cnt += m - i + 1
+            if arr[i] > arr[j]:
+
+                # Everything from i2 to m is an inversion relative to j
+                cnt += m - i2 + 1
+
                 tmp[k] = arr[j]
                 j += 1; k += 1
+
+                # Push i2 away to keep it min_dist away
+                while i2 <= m and j <= r and (arr[i2] - arr[j]) < min_dist:
+                    i2 += 1
+
+            else:
+                tmp[k] = arr[i]
+                i += 1; k += 1
         
         # Copy the remaining bits of left and right
         while i <= m: tmp[k] = arr[i]; k += 1; i += 1
