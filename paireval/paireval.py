@@ -111,7 +111,7 @@ def naive_eval(scores, labels, min_dist=0.5):
     m = 0   # Ranked correctly
     
     for j in range(1, len(scores)):
-        for i in range(i):
+        for i in range(j):
             
             # Is (i, j) rankable?
             if np.abs(labels[i] - labels[j]) >= min_dist:
