@@ -47,5 +47,22 @@ def test_or(n, m, k):
         n2  =  pe.naive_eval(scores, labels, 0.5)
         report(nln, n2)        
 
+def test_rg(n, k):
+    '''
+    n - number of samples
+    k - number of tests
+    '''
+    print("Testing linear regression")
+    for iter in range(k):
+        print(f"Iteration {iter+1}")
+        labels = np.random.uniform(size=n)
+        scores = np.random.uniform(size=n)
+        mdist  = np.random.uniform(size=1)
+
+        nln = pe.paired_eval(scores, labels, mdist)
+        n2  =  pe.naive_eval(scores, labels, mdist)
+        report(nln, n2)
+
 test_bc(100, 20)
 test_or(100, 5, 20)
+test_rg(100, 20)

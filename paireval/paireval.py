@@ -22,7 +22,7 @@ def paired_eval(scores, labels, min_dist=0.5):
     
     # Argument verification
     if len(scores) < 2:
-        raise Exception("Paired eval requires at least one rankable pair")
+        raise Exception("Paired eval requires at least one pair")
     if len(scores) != len(labels):
         raise Exception("The number of scores and labels must be the same")
         
@@ -37,7 +37,7 @@ def paired_eval(scores, labels, min_dist=0.5):
     
     # Reaching the end of the array indicates there are no rankable pairs
     if (sl[r] - sl[l]) < min_dist:
-        raise Exception("Paired eval requires at least one rankable pair")
+        return 0, 0
         
     while r < len(sl):
     
