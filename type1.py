@@ -4,6 +4,7 @@ import sklearn.ensemble
 import sklearn.model_selection
 import paireval as pe
 import scipy
+import matplotlib.pyplot as plt
 
 # Load relevant data
 fnStem = 'https://raw.githubusercontent.com/labsyspharm/brca-profiling/main/data'
@@ -30,7 +31,7 @@ def eval1(xtr, ytr, xte, yte):
 
 
 pvals = []
-for iter in range(100):
+for iter in range(1000):
     xtr, xte, ytr, yte = sklearn.model_selection.train_test_split(x, y, test_size=0.2)
 
     if not all(xtr.index == ytr.index):
@@ -42,3 +43,22 @@ for iter in range(100):
     m1 = eval1(xtr, ytr, xte, yte)
     m2 = eval1(xtr, ytr, xte, yte)
     pvals.append(scipy.stats.fisher_exact([m1, m2]).pvalue)
+
+# Collect statistics
+x = np.linspace(0.01, 0.5, num=50)
+y = np.zeros_like(x)
+for i in range(len(x)):
+    y[i] = np.sum(pvals <= x[i]) / len(pvals)
+
+# Compose the plot
+fig, ax = plt.subplots()
+ax.set_facecolor("whitesmoke")
+plt.grid(color = 'white', linestyle = '-', linewidth = 1)
+ax.plot(x, y, color='red')
+ax.plot([0, 0.5], [0, 0.5], '--', color='gray')
+#ax.axvline(0.05, linestyle=':', color='blue')
+ax.set_xlabel('Significance threshold')
+ax.set_ylabel('Number of p values below threshold')
+ax.set_xlim([0, 0.5])
+ax.set_ylim([0, 0.5])
+fig.savefig('type1.png', bbox_inches='tight')
