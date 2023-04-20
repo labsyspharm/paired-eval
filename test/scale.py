@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import time
-import paireval as pe
+import pairedeval as pe
 import matplotlib.pyplot as plt
 
 # Worker function
@@ -14,7 +14,7 @@ def timeit(n):
     return (t1-t0)
 
 # Set up the results structure
-niter = 10
+niter = 30
 x = [10, 100, 1000, 10000, 100000, 1000000]
 t = np.zeros([niter, len(x)])
 
@@ -50,4 +50,5 @@ ax.set_yticks(np.log10(ytk))
 ax.set_yticklabels(ytk)
 ax.set_ylabel('Execution time (s)')
 
+fig.savefig('scaling.pdf', bbox_inches='tight')
 fig.savefig('scaling.png', bbox_inches='tight')

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import sklearn.ensemble
 import sklearn.model_selection
-import paireval as pe
+import pairedeval as pe
 import scipy
 import matplotlib.pyplot as plt
 
@@ -58,7 +58,9 @@ ax.plot(x, y, color='red')
 ax.plot([0, 0.5], [0, 0.5], '--', color='gray')
 #ax.axvline(0.05, linestyle=':', color='blue')
 ax.set_xlabel('Significance threshold')
-ax.set_ylabel('Fract of p values below threshold')
+ax.set_ylabel('Fraction of p values below threshold')
 ax.set_xlim([0, 0.5])
 ax.set_ylim([0, 0.5])
+
+fig.savefig('type1.pdf', bbox_inches='tight')
 fig.savefig('type1.png', bbox_inches='tight')
