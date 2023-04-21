@@ -19,7 +19,7 @@ x  = (pd.read_csv(f"{fnStem}/rnaseq_log2rpkm.csv")
     .filter(y.index)
     .T)
 
-# Train a model
+# Train and evaluate a random forest model
 def eval1(xtr, ytr, xte, yte):
     mdl = sklearn.ensemble.RandomForestRegressor(max_depth=5)
     mdl.fit(xtr, ytr['GR_AOC'])
@@ -29,7 +29,7 @@ def eval1(xtr, ytr, xte, yte):
     nr, nc = pe.paired_eval(scores, yte['GR_AOC'], min_dist=0.1)
     return nc, (nr-nc)
 
-# Train a linear regression model
+# Train and evaluate a linear regression model
 def eval2(xtr, ytr, xte, yte):
     mdl = sklearn.linear_model.LinearRegression()
     mdl.fit(xtr, ytr['GR_AOC'])
@@ -50,9 +50,11 @@ for iter in range(1000):
         raise Exception("Sample-label mismatch in the test data")
 
     print(f"Iteration {iter}")
-    m0 = eval1(xtr, ytr, xte, yte)
-    m1 = eval1(xtr, ytr, xte, yte)
-    m2 = eval2(xtr, ytr, xte, yte)
+    m0 = eval1(xtr, ytr, xte, yte)  # Reference random forest model
+    m1 = eval1(xtr, ytr, xte, yte)  # A second random forest model
+    m2 = eval2(xtr, ytr, xte, yte)  # A linear regression model
+
+    # Compare all to the reference
     pvals1.append(scipy.stats.fisher_exact([m0, m1]).pvalue)
     pvals2.append(scipy.stats.fisher_exact([m0, m2]).pvalue)
 
@@ -72,7 +74,6 @@ ax.plot(xs, y1, color='red', label="Similar models")
 ax.plot(xs, y2, color='blue', label="Different models")
 ax.plot([0, 0.5], [0, 0.5], '--', color='gray', label="Reference")
 ax.legend(loc='upper left')
-#ax.axvline(0.05, linestyle=':', color='blue')
 ax.set_xlabel('Significance threshold')
 ax.set_ylabel('Fraction of p values below threshold')
 ax.set_xlim([0, 0.5])
