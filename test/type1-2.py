@@ -20,43 +20,55 @@ x  = (pd.read_csv(f"{fnStem}/rnaseq_log2rpkm.csv")
     .T)
 
 # Train and evaluate a random forest model
-def eval1(xtr, ytr, xte, yte):
+def eval1(xtr, ytr, xte, yte, md=0.1):
     mdl = sklearn.ensemble.RandomForestRegressor(max_depth=5)
     mdl.fit(xtr, ytr['GR_AOC'])
 
     # Evaluate the predictions
     scores = mdl.predict(xte)
-    nr, nc = pe.paired_eval(scores, yte['GR_AOC'], min_dist=0.1)
+    nr, nc = pe.paired_eval(scores, yte['GR_AOC'], min_dist=md)
     return nc, (nr-nc)
 
 # Train and evaluate a linear regression model
-def eval2(xtr, ytr, xte, yte):
+def eval2(xtr, ytr, xte, yte, md=0.1):
     mdl = sklearn.linear_model.LinearRegression()
     mdl.fit(xtr, ytr['GR_AOC'])
     
     # Evaluate the predictions
     scores = mdl.predict(xte)
-    nr, nc = pe.paired_eval(scores, yte['GR_AOC'], min_dist=0.1)
+    nr, nc = pe.paired_eval(scores, yte['GR_AOC'], min_dist=md)
     return nc, (nr-nc)
 
-pvals1 = []
-pvals2 = []
-for iter in range(1000):
-    xtr, xte, ytr, yte = sklearn.model_selection.train_test_split(x, y, test_size=0.2)
+# Comparison of random forest and logistic regression models
+def comparison(niter=100, md=0.1):
+    pvals1 = []; aucs1 = []
+    pvals2 = []; aucs2 = []
+    for iter in range(niter):
+        xtr, xte, ytr, yte = sklearn.model_selection.train_test_split(x, y, test_size=0.2)
 
-    if not all(xtr.index == ytr.index):
-        raise Exception("Sample-label mismatch in the training data")
-    if not all(xte.index == yte.index):
-        raise Exception("Sample-label mismatch in the test data")
+        if not all(xtr.index == ytr.index):
+            raise Exception("Sample-label mismatch in the training data")
+        if not all(xte.index == yte.index):
+            raise Exception("Sample-label mismatch in the test data")
 
-    print(f"Iteration {iter}")
-    m0 = eval1(xtr, ytr, xte, yte)  # Reference random forest model
-    m1 = eval1(xtr, ytr, xte, yte)  # A second random forest model
-    m2 = eval2(xtr, ytr, xte, yte)  # A linear regression model
+        print(f"Iteration {iter}")
+        m0 = eval1(xtr, ytr, xte, yte, md=md)  # Reference random forest model
+        m1 = eval1(xtr, ytr, xte, yte, md=md)  # A second random forest model
+        m2 = eval2(xtr, ytr, xte, yte, md=md)  # A linear regression model
 
-    # Compare all to the reference
-    pvals1.append(scipy.stats.fisher_exact([m0, m1]).pvalue)
-    pvals2.append(scipy.stats.fisher_exact([m0, m2]).pvalue)
+        # Catalog AUCs
+        if m1[0] + m1[1] > 0:
+            aucs1.append(m1[0] / (m1[0]+m1[1]))
+        if m2[0] + m2[1] > 0:
+            aucs2.append(m2[0] / (m2[0]+m2[1]))
+
+        # Compare all to the reference
+        pvals1.append(scipy.stats.fisher_exact([m0, m1]).pvalue)
+        pvals2.append(scipy.stats.fisher_exact([m0, m2]).pvalue)
+        
+    return pvals1, pvals2, aucs1, aucs2
+
+pvals1, pvals2, aucs1, aucs2 = comparison(1000, 0.1)
 
 # Collect statistics
 xs = np.linspace(0.01, 0.5, num=50)
