@@ -21,7 +21,7 @@ x  = (pd.read_csv(f"{fnStem}/rnaseq_log2rpkm.csv")
 
 # Train and evaluate a random forest model
 def eval1(xtr, ytr, xte, yte, md=0.1):
-    mdl = sklearn.ensemble.RandomForestRegressor(max_depth=5)
+    mdl = sklearn.ensemble.RandomForestRegressor(n_estimators=22)
     mdl.fit(xtr, ytr['GR_AOC'])
 
     # Evaluate the predictions
