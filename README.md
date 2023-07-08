@@ -1,6 +1,6 @@
 # Paired evaluation of machine learning models
 
-An O(n log n) implementation of [paired evaluation](https://doi.org/10.1101/2022.09.07.507020).
+An O(n log n) implementation of [paired evaluation](https://www.cell.com/patterns/fulltext/S2666-3899(23)00146-0).
 
 ## Installation
 
