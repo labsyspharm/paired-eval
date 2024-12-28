@@ -3,7 +3,7 @@ import numpy as np
 def paired_eval(scores, labels, min_dist=0.5):
     '''
     An O(n log n) implementation of paired evaluation
-    https://doi.org/10.1101/2022.09.07.507020
+    https://doi.org/10.1016/j.patter.2023.100824
 
     Parameters
     ----------
